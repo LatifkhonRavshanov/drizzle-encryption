@@ -12,7 +12,7 @@ import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Separator } from "~/components/ui/separator";
 import { Input } from "~/components/ui/input";
-import { Loader2, Database, Lock, Unlock, Plus } from "lucide-react";
+import { Loader2, Database, Lock, Unlock, Plus, Github } from "lucide-react";
 import { useState } from "react";
 
 export default function Home() {
@@ -41,6 +41,17 @@ export default function Home() {
       <div className="container mx-auto max-w-6xl px-4 py-8">
         {/* Header */}
         <div className="mb-8 text-center">
+          <div className="mb-4 flex justify-center">
+            <a
+              href="https://github.com/OmarMcAdam/drizzle-encryption"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Github className="h-4 w-4" />
+              View on GitHub
+            </a>
+          </div>
           <h1 className="mb-2 text-3xl font-bold text-gray-900">
             Drizzle Encryption Demo
           </h1>
