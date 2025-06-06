@@ -152,11 +152,13 @@ await db.insert(users).values({
 const allUsers = await db.select().from(users);
 // allUsers[0].email === "user@example.com" (decrypted automatically)
 
-// Filtering works normally
-const activeUsers = await db
-  .select()
-  .from(users)
-  .where(eq(users.isActive, true));
+// ⚠️ NOTE: Filtering on encrypted fields is NOT supported
+// The database only sees encrypted values, so this WON'T work:
+// const activeUsers = await db.select().from(users).where(eq(users.isActive, true));
+
+// Instead, filter in application code after decryption:
+const allUsers = await db.select().from(users);
+const activeUsers = allUsers.filter((user) => user.isActive === true);
 ```
 
 ### Custom Encryption Implementation
@@ -190,6 +192,41 @@ console.log(decrypted); // "secret information"
    - Converts it back to the original data type
 
 3. **Type Safety**: TypeScript ensures you work with the correct data types, even though the underlying storage is encrypted strings.
+
+## Limitations
+
+### Database Operations on Encrypted Fields
+
+**⚠️ Important**: Encrypted fields have significant limitations for database operations:
+
+- **No Filtering**: You cannot use `WHERE` clauses on encrypted fields
+- **No Sorting**: `ORDER BY` on encrypted fields will sort by encrypted values, not original data
+- **No Indexing**: Database indexes on encrypted fields are not useful for queries
+- **No Aggregations**: `COUNT`, `SUM`, etc. operations don't work meaningfully on encrypted data
+- **No Full-Text Search**: Search operations must be done in application code
+
+**Recommended Approach**: Use encrypted fields for sensitive data that you need to store securely but don't need to query directly. Keep searchable/filterable fields unencrypted or use additional indexed fields for query purposes.
+
+```typescript
+export const users = pgTable("users", {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+
+  // Encrypted sensitive data
+  email: encrypted("email", "varchar"),
+  personalInfo: encrypted("personal_info", "json"),
+
+  // Unencrypted fields for querying
+  isActive: boolean("is_active").default(true), // Keep unencrypted for filtering
+  departmentId: integer("department_id"), // Keep unencrypted for joins
+  createdAt: timestamp().defaultNow(),
+});
+
+// This works - filtering on unencrypted fields
+const activeUsers = await db
+  .select()
+  .from(users)
+  .where(eq(users.isActive, true));
+```
 
 ## Security Considerations
 
