@@ -167,7 +167,13 @@ export default function Home() {
                       className="rounded-lg border bg-gray-50 p-3"
                     >
                       <div className="flex flex-row items-center justify-between">
-                        <span className="font-medium">{data.name}</span>
+                        <div className="flex flex-row items-center gap-6">
+                          <span className="text-xs text-gray-600">
+                            ID: {data.id}
+                            {data.name}
+                          </span>
+                          <span className="font-medium">{data.name}</span>
+                        </div>
                         <div className="flex flex-row items-center gap-6">
                           {data.createdAt && (
                             <span className="text-muted-foreground text-xs">
