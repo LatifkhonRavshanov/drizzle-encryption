@@ -147,7 +147,7 @@ export default function Home() {
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Lock className="h-5 w-5" />
-                <CardTitle>Encrypted Data</CardTitle>
+                <CardTitle>Decrypted Data</CardTitle>
                 <Badge variant="secondary">{datas.length} records</Badge>
               </div>
               <CardDescription>
@@ -209,7 +209,7 @@ export default function Home() {
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Unlock className="h-5 w-5" />
-                <CardTitle>Decrypted Data</CardTitle>
+                <CardTitle>Encrypted Data</CardTitle>
                 <Badge variant="secondary">
                   {unencryptedDatas.length} records
                 </Badge>
@@ -230,7 +230,7 @@ export default function Home() {
                       key={unencryptedDatas.length - 1 - index}
                       className="rounded-lg border bg-gray-50 p-3"
                     >
-                      <pre className="font-mono text-sm break-all whitespace-pre-wrap text-gray-700">
+                      <pre className="font-mono text-xs break-all whitespace-pre-wrap text-gray-700">
                         {JSON.stringify(data, null, 2)}
                       </pre>
                     </div>
