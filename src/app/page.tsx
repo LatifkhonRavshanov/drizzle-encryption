@@ -170,7 +170,6 @@ export default function Home() {
                         <div className="flex flex-row items-center gap-6">
                           <span className="text-xs text-gray-600">
                             ID: {data.id}
-                            {data.name}
                           </span>
                           <span className="font-medium">{data.name}</span>
                         </div>
